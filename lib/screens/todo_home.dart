@@ -49,24 +49,42 @@ class _TodoScreenState extends State<TodoScreen> {
           itemCount: _todos.length,
           itemBuilder: (context, index) {
             final todo = _todos[index];
-            return ListTile(
-              onTap: () {
-                _showEditDialog(todo,index);
-              },
-              title: Text("${todo.title}"),
-              subtitle: Text("${todo.description}"),
-              trailing: Checkbox(
-                value: todo.completed,
-                onChanged: (value) {
-                  setState(() {
-                    ///vale togglee
-                    todo.completed=value!;
-                    _todoService.updateTodo(index, todo);
-                    setState(() {
-                      
-                    });
-                  });
+            return Card(
+              elevation: 5.0,
+              child: ListTile(
+                leading: CircleAvatar(
+                  child: Text("${index+1}"),
+                ),
+                onTap: () {
+                  _showEditDialog(todo,index);
                 },
+                title: Text("${todo.title}"),
+                subtitle: Text("${todo.description}"),
+                trailing: Container(
+                  width: 100,
+                  child: Row(
+                    children: [
+                      Checkbox(
+                        value: todo.completed,
+                        onChanged: (value) {
+                          setState(() {
+                            ///vale togglee
+                            todo.completed=value!;
+                            _todoService.updateTodo(index, todo);
+                            setState(() {
+                              
+                            });
+                          });
+                        },
+                      ),
+                      IconButton(onPressed: ()async{
+                       await _todoService.deleteTodo(index);
+                       _loadTodos();
+                      }, icon: Icon(Icons.delete,
+                      color: Colors.red,))
+                    ],
+                  ),
+                ),
               ),
             );
           },
@@ -116,7 +134,7 @@ class _TodoScreenState extends State<TodoScreen> {
               },
               child: Text("Add"),
             ),
-            ElevatedButton(onPressed: () {}, child: Text("Cancel")),
+            ElevatedButton(onPressed: () {Navigator.pop(context);}, child: Text("Cancel")),
           ],
         );
       },
@@ -149,23 +167,30 @@ _descController.text=todo.description;
           actions: [
             ElevatedButton(
               onPressed: () async {
-                final newTodo = Todo(
-                  title: _titleController.text,
-                  description: _descController.text,
-                  createdAt: DateTime.now(),
-                  completed: false,
-                );
-                await _todoService.addTodo(newTodo);
+               
+               todo.title=_titleController.text;
+               todo.description=_descController.text;
+               todo.createdAt= DateTime.now();
+
+               if(todo.completed==true)
+               {
+                todo.completed=false;
+               }
+
+                await _todoService.updateTodo(index,todo);
                 _titleController.clear();
                 _descController.clear();
 
                 Navigator.pop(context);
+
                 _loadTodos();
 
               },
               child: Text("Edit"),
             ),
-            ElevatedButton(onPressed: () {}, child: Text("Cancel")),
+            ElevatedButton(onPressed: () {
+              Navigator.pop(context);
+            }, child: Text("Cancel")),
           ],
         );
       },
