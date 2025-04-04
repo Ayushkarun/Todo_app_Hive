@@ -19,6 +19,7 @@ class _TodoScreenState extends State<TodoScreen> {
 
   Future<void> _loadTodos() async {
     _todos = await _todoService.getTodos();
+    print(_todos.length);
     setState(() {});
   }
 
@@ -52,11 +53,9 @@ class _TodoScreenState extends State<TodoScreen> {
             return Card(
               elevation: 5.0,
               child: ListTile(
-                leading: CircleAvatar(
-                  child: Text("${index+1}"),
-                ),
+                leading: CircleAvatar(child: Text("${index + 1}")),
                 onTap: () {
-                  _showEditDialog(todo,index);
+                  _showEditDialog(todo, index);
                 },
                 title: Text("${todo.title}"),
                 subtitle: Text("${todo.description}"),
@@ -69,19 +68,19 @@ class _TodoScreenState extends State<TodoScreen> {
                         onChanged: (value) {
                           setState(() {
                             ///vale togglee
-                            todo.completed=value!;
+                            todo.completed = value!;
                             _todoService.updateTodo(index, todo);
-                            setState(() {
-                              
-                            });
+                            setState(() {});
                           });
                         },
                       ),
-                      IconButton(onPressed: ()async{
-                       await _todoService.deleteTodo(index);
-                       _loadTodos();
-                      }, icon: Icon(Icons.delete,
-                      color: Colors.red,))
+                      IconButton(
+                        onPressed: () async {
+                          await _todoService.deleteTodo(index);
+                          _loadTodos();
+                        },
+                        icon: Icon(Icons.delete, color: Colors.red),
+                      ),
                     ],
                   ),
                 ),
@@ -130,19 +129,24 @@ class _TodoScreenState extends State<TodoScreen> {
 
                 Navigator.pop(context);
                 _loadTodos();
-
               },
               child: Text("Add"),
             ),
-            ElevatedButton(onPressed: () {Navigator.pop(context);}, child: Text("Cancel")),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("Cancel"),
+            ),
           ],
         );
       },
     );
   }
-  Future<void> _showEditDialog(Todo todo,int index) async {
-    _titleController.text=todo.title;
-_descController.text=todo.description;
+
+  Future<void> _showEditDialog(Todo todo, int index) async {
+    _titleController.text = todo.title;
+    _descController.text = todo.description;
     await showDialog(
       context: context,
       builder: (context) {
@@ -167,30 +171,30 @@ _descController.text=todo.description;
           actions: [
             ElevatedButton(
               onPressed: () async {
-               
-               todo.title=_titleController.text;
-               todo.description=_descController.text;
-               todo.createdAt= DateTime.now();
+                todo.title = _titleController.text;
+                todo.description = _descController.text;
+                todo.createdAt = DateTime.now();
 
-               if(todo.completed==true)
-               {
-                todo.completed=false;
-               }
+                if (todo.completed == true) {
+                  todo.completed = false;
+                }
 
-                await _todoService.updateTodo(index,todo);
+                await _todoService.updateTodo(index, todo);
                 _titleController.clear();
                 _descController.clear();
 
                 Navigator.pop(context);
 
                 _loadTodos();
-
               },
               child: Text("Edit"),
             ),
-            ElevatedButton(onPressed: () {
-              Navigator.pop(context);
-            }, child: Text("Cancel")),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("Cancel"),
+            ),
           ],
         );
       },
